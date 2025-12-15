@@ -1,6 +1,6 @@
-streamlit
+flask
 ultralytics
-numpy
-pillow
 torch
 torchvision
+numpy
+pillow

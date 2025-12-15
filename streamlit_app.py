@@ -1,8 +1,8 @@
 import streamlit as st
-import cv2
 import numpy as np
 import math
 from ultralytics import YOLO
+from PIL import Image
 from HelperFunction import findPokerHand
 
 st.title("🃏 Poker Hand Detection")
@@ -18,10 +18,10 @@ classNames = ['10C','10D','10H','10S','2C','2D','2H','2S','3C','3D','3H','3S',
 uploaded = st.file_uploader("Upload poker card image", type=["jpg","png","jpeg"])
 
 if uploaded:
-    img_bytes = np.asarray(bytearray(uploaded.read()), dtype=np.uint8)
-    img = cv2.imdecode(img_bytes, cv2.IMREAD_COLOR)
+    image = Image.open(uploaded).convert("RGB")
+    img_np = np.array(image)
 
-    results = model(img, stream=True)
+    results = model(img_np)
     hand = []
 
     for r in results:
@@ -34,5 +34,5 @@ if uploaded:
     hand = list(set(hand))
     result = findPokerHand(hand)
 
-    st.image(img, channels="BGR")
+    st.image(image, caption="Uploaded Image")
     st.success(f"Detected Hand: {result}")

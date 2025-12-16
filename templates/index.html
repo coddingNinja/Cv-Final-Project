@@ -2,18 +2,106 @@
 <html>
 <head>
     <title>Poker Hand Detection</title>
+
+    <style>
+        body {
+            background: #0f172a;
+            font-family: Arial;
+            color: white;
+            margin: 0;
+        }
+        h1 { text-align: center; padding: 20px; }
+        .container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+        .box {
+            background: #020617;
+            border-radius: 12px;
+            padding: 15px;
+        }
+        img {
+            width: 100%;
+            border-radius: 10px;
+            border: 2px solid #334155;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .result {
+            margin-top: 15px;
+            background: #020617;
+            padding: 15px;
+            border-radius: 12px;
+        }
+        .hand {
+            font-size: 22px;
+            color: #22c55e;
+            font-weight: bold;
+        }
+    </style>
 </head>
+
 <body>
-    <h2>Poker Hand Detection</h2>
 
-    <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="image" required>
-        <br><br>
-        <button type="submit">Detect</button>
-    </form>
+<h1>🃏 Poker Hand Detection</h1>
 
-    {% if result %}
-        <h3>Detected Hand: {{ result }}</h3>
-    {% endif %}
+<div class="container">
+
+    <!-- CAMERA -->
+    <div class="box">
+        <h3>Live Camera</h3>
+        <img src="{{ url_for('video') }}">
+        <div class="result" style="margin-top:10px;">
+            <h4>Camera Detection</h4>
+            <div class="hand" id="cameraHand">No result yet</div>
+            <p id="cameraCards"></p>
+        </div>
+    </div>
+
+    <!-- UPLOAD + RESULT -->
+    <div>
+        <div class="box">
+            <h3>Upload Card Images (Multiple)</h3>
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                <input type="file" name="images" accept="image/*" multiple required>
+                <br><br>
+                <button type="submit">Detect Hand</button>
+            </form>
+        </div>
+
+        <div class="result">
+            <h3>Uploaded Images Detection</h3>
+            <div class="hand" id="uploadHand">
+                {{ upload_hand if upload_hand else "No result yet" }}
+            </div>
+            <p id="uploadCards">{{ upload_cards }}</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- CAMERA RESULT AUTO UPDATE -->
+<script>
+setInterval(() => {
+    fetch('/camera_result')
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("cameraHand").innerText = data.hand;
+            document.getElementById("cameraCards").innerText = data.cards;
+        })
+        .catch(err => console.log(err));
+}, 1000);
+</script>
+
 </body>
 </html>
